@@ -54,7 +54,7 @@ export class EventIterable {
   }
 }
 
-export async listen(iterable, handler) {
+export async function listen(iterable, handler) {
   for await (const event of iterable) {
     handler(event);
   }
