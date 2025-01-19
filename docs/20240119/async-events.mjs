@@ -5,7 +5,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 // Implements the async iterable interface
 // Produces data independent of consumption, therefore a push source
-class EventIterable {
+export class EventIterable {
   #next;
   constructor(subscribe) {
     // subscribe acts as the subscribe function of an observable (takes an observer as an argument), except that complete also takes an optional value argument
