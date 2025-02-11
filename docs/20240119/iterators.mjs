@@ -47,13 +47,13 @@ class SourceIterator extends AsyncIterator {
     });
   }
 }
+export const __SourceIterator__ = SourceIterator.prototype;
 Object.defineProperty(__SourceIterator__, "constructor", {
   value: __SourceIterator__.constructor,
   writable: false,
   enumerable: false,
   configurable: false,
 });
-export const __SourceIterator__ = SourceIterator.prototype;
 export class Source {
   #info;
   constructor(init) {
@@ -184,13 +184,13 @@ class Stream extends Promise {
     canceled = true;
   }
 }
+export const __Stream__ = Stream.prototype;
 Object.defineProperty(__Stream__, "constructor", {
   value: __Stream__.constructor,
   writable: false,
   enumerable: false,
   configurable: false,
 });
-export const __Stream__ = Stream.prototype;
 export class Sink {
   #handler;
   // handler may be either sync or async function, but return value is ignored and not awaited.
