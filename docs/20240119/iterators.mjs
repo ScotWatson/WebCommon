@@ -15,13 +15,23 @@ export const __GeneratorFunction__ = GeneratorFunction.prototype;
 export const __Generator__ = __GeneratorFunction__.prototype;
 // Per ECMAScript 2024, __Generator__.constuctor === __GeneratorFunction__, but typeof __GeneratorFunction__ !== "function".
 export const __Iterator__ = Object.getPrototypeOf(__Generator__);
-export const Iterator = __Iterator__.constructor;  // Not guarenteed by ECMAScript 2024, but supported by major browsers
+// Dummy constructor to allow use in "extends"
+export const Iterator = (() => {
+  const constructor = function () { };
+  constructor.prototype = __Iterator__;
+  return constructor;
+})();
 export const AsyncGeneratorFunction = (async function* () {}).constructor;
 export const __AsyncGeneratorFunction__ = AsyncGeneratorFunction.prototype;
 export const __AsyncGenerator__ = __AsyncGeneratorFunction__.prototype;
 // Per ECMAScript 2024, __AsyncGenerator__.constuctor === __AsyncGeneratorFunction__, but typeof __AsyncGeneratorFunction__ !== "function".
 export const __AsyncIterator__ = Object.getPrototypeOf(__AsyncGenerator__);
-export const AsyncIterator = __AsyncIterator__.constructor;  // Not guarenteed by ECMAScript 2024, but supported by major browsers
+// Dummy constructor to allow use in "extends"
+export const AsyncIterator = (() => {
+  const constructor = function () { };
+  constructor.prototype = __AsyncIterator__;
+  return constructor;
+})();
 
 // Implements the async iterable interface
 // Produces data independent of consumption, therefore a push source
