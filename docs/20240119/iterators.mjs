@@ -81,7 +81,12 @@ export class Source {
         waitForInput();
       },
     };
-    this.prototype = Object.create(__SourceIterator__);
+    Object.defineProperty(this, "prototype", {
+      value: Object.create(__SourceIterator__),
+      writable: false,
+      enumerable: false,
+      configurable: false,
+    });
     init(capabilities);
   }
   [Symbol.asyncIterator]() {
@@ -151,7 +156,12 @@ export class Sink {
   // handler may be either sync or async function, but return value is ignored and not awaited.
   constructor(handler) {
     this.#handler = handler;
-    this.prototype = Object.create(__Stream__);
+    Object.defineProperty(this, "prototype", {
+      value: Object.create(__Stream__),
+      writable: false,
+      enumerable: false,
+      configurable: false,
+    });
   }
   // The return value inherits from Promise, therefore it can be treated like a promise.
   stream(input) {
