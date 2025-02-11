@@ -47,6 +47,12 @@ class SourceIterator extends AsyncIterator {
     });
   }
 }
+Object.defineProperty(__SourceIterator__, "constructor", {
+  value: __SourceIterator__.constructor,
+  writable: false,
+  enumerable: false,
+  configurable: false,
+});
 export const __SourceIterator__ = SourceIterator.prototype;
 export class Source {
   #info;
@@ -83,7 +89,7 @@ export class Source {
     };
     Object.defineProperty(this, "prototype", {
       value: Object.create(__SourceIterator__),
-      writable: false,
+      writable: true,
       enumerable: false,
       configurable: false,
     });
@@ -113,11 +119,38 @@ Object.defineProperty(__SourceIterator__, "constructor", {
   enumerable: false,
   configurable: false,
 });
+Object.defineProperty(__Source__, Symbol.toStringTag, {
+  value: "Source",
+  writable: false,
+  enumerable: false,
+  configurable: false,
+});
+Object.defineProperty(__SourceIterator__, Symbol.toStringTag, {
+  value: "SourceIterator",
+  writable: false,
+  enumerable: false,
+  configurable: false,
+});
 
 function createSourceFromEvent(target, eventName) {
-  return new Source(({ next, complete, error }) => {
+  let _next;
+  let _complete;
+  let _error;
+  const ret = new Source(({ next, complete, error }) => {
     target.addEventListener(eventName, next);
+    _next = next;
+    _complete = complete;
+    _error = error;
   });
+  ret.stop = (value) => {
+    target.removeEventListener(eventName, _next);
+    _complete(value);
+  };
+  ret.throw = (reason) => {
+    target.removeEventListener(eventName, _next);
+    _error(reason);
+  };
+  return ret;
 }
 
 // input must be async iterator
@@ -127,10 +160,11 @@ class Stream extends Promise {
   constructor(input, handler) {
     super((resolve, reject) => {
       (async () => {
-        const { value, done } = await input.next();
+        const iterator = input[Symbol.asyncIterator]();
+        const { value, done } = await iterator.next();
         while (!done && !canceled) {
           handler(value);
-          ({ value, done } = await input.next());
+          ({ value, done } = await iterator.next());
         }
         if (canceled) {
           throw new Error("Stream was canceled.");
@@ -150,6 +184,12 @@ class Stream extends Promise {
     canceled = true;
   }
 }
+Object.defineProperty(__Stream__, "constructor", {
+  value: __Stream__.constructor,
+  writable: false,
+  enumerable: false,
+  configurable: false,
+});
 export const __Stream__ = Stream.prototype;
 export class Sink {
   #handler;
@@ -158,7 +198,7 @@ export class Sink {
     this.#handler = handler;
     Object.defineProperty(this, "prototype", {
       value: Object.create(__Stream__),
-      writable: false,
+      writable: true,
       enumerable: false,
       configurable: false,
     });
@@ -179,6 +219,18 @@ Object.defineProperty(__Sink__, "prototype", {
 });
 Object.defineProperty(__Stream__, "constructor", {
   value: __Sink__,
+  writable: false,
+  enumerable: false,
+  configurable: false,
+});
+Object.defineProperty(__Sink__, Symbol.toStringTag, {
+  value: "Sink",
+  writable: false,
+  enumerable: false,
+  configurable: false,
+});
+Object.defineProperty(__Stream__, Symbol.toStringTag, {
+  value: "Stream",
   writable: false,
   enumerable: false,
   configurable: false,
