@@ -133,7 +133,7 @@ export class Queue {
       }
     });
     const reading = reader.stream(input);
-    const ret = await reading;
+//    const ret = await reading;
     return {
       dequeue() {
         return contents.shift();
