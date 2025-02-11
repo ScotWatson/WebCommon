@@ -25,7 +25,7 @@ export const AsyncIterator = __AsyncIterator__.constructor;  // Not guarenteed b
 
 // Implements the async iterable interface
 // Produces data independent of consumption, therefore a push source
-class SourceView extends __AsyncIterator__ {
+class SourceView extends AsyncIterator {
   #info;
   constructor(info) {
     this.#info = info;
