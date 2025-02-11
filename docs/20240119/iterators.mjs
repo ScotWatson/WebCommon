@@ -35,7 +35,7 @@ export const AsyncIterator = (() => {
 
 // Implements the async iterable interface
 // Produces data independent of consumption, therefore a push source
-class SourceView extends AsyncIterator {
+class SourceIterator extends AsyncIterator {
   #info;
   constructor(info) {
     super();
@@ -47,7 +47,7 @@ class SourceView extends AsyncIterator {
     });
   }
 }
-export const __SourceView__ = SourceView.prototype;
+export const __SourceIterator__ = SourceIterator.prototype;
 export class Source {
   #info;
   constructor(init) {
@@ -81,68 +81,98 @@ export class Source {
         waitForInput();
       },
     };
-    this.viewPrototype = Object.create(__SourceView__);
+    this.prototype = Object.create(__SourceIterator__);
     init(capabilities);
   }
   [Symbol.asyncIterator]() {
-    // This function returns a SourceView
+    // This function returns a SourceIterator
     // This function may be called more than once, allowing for multiple consumers
     // Client code may stop consuming (calling next()) at any time, so values are not stored up after the last promise returned from next() is settled.
     // Client code that is still consuming is responsible for calling next() as soon as possible after the last return value has settled.
     // Calling next() multiple times between values creates multiple promises that all settle simultaneously.
-    const ret = new SourceView(this.#info);
-    Object.setPrototypeOf(ret, this.viewPrototype);
+    const ret = new SourceIterator(this.#info);
+    Object.setPrototypeOf(ret, this.prototype);
     return ret;
   }
 }
 export const __Source__ = Source.prototype;
 Object.defineProperty(__Source__, "prototype", {
-  value: __SourceView__,
+  value: __SourceIterator__,
   writable: false,
   enumerable: false,
   configurable: false,
 });
-Object.defineProperty(__SourceView__, "constructor", {
+Object.defineProperty(__SourceIterator__, "constructor", {
   value: __Source__,
   writable: false,
   enumerable: false,
   configurable: false,
 });
 
+function createSourceFromEvent(target, eventName) {
+  return new Source(({ next, complete, error }) => {
+    target.addEventListener(eventName, next);
+  });
+}
+
 // input must be async iterator
 // settles when the input ends
+class Stream extends Promise {
+  #canceled;
+  constructor(input, handler) {
+    super((resolve, reject) => {
+      (async () => {
+        const { value, done } = await input.next();
+        while (!done && !canceled) {
+          handler(value);
+          ({ value, done } = await input.next());
+        }
+        if (canceled) {
+          throw new Error("Stream was canceled.");
+        }
+        return value;
+        /*
+        Similar to the following, except it returns the final value:
+        for await (const value of input) {
+          handler(value);
+        }
+        */
+      })().then(resolve, reject);
+    });
+    this.#canceled = false;
+  }
+  cancel() {
+    canceled = true;
+  }
+}
+export const __Stream__ = Stream.prototype;
 export class Sink {
   #handler;
   // handler may be either sync or async function, but return value is ignored and not awaited.
   constructor(handler) {
     this.#handler = handler;
+    this.prototype = Object.create(__Stream__);
   }
-  // similar to an async function, except the promise is cancelable
+  // The return value inherits from Promise, therefore it can be treated like a promise.
   stream(input) {
-    let canceled = false;
-    const ret = (async () => {
-      const { value, done } = await input.next();
-      while (!done && !canceled) {
-        this.#handler(value);
-        ({ value, done } = await input.next());
-      }
-      if (canceled) {
-        throw new Error("Stream was canceled.");
-      }
-      return value;
-      /*
-      Similar to the following, except it returns the final value:
-      for await (const value of input) {
-        this.#handler(value);
-      }
-      */
-    })();
-    ret.cancel = () => {
-      canceled = true;
-    };
+    const ret = new Stream(input, this.#handler);
+    Object.setPrototypeOf(ret, this.prototype);
     return ret;
   }
 }
+export const __Sink__ = Sink.prototype;
+Object.defineProperty(__Sink__, "prototype", {
+  value: __Stream__,
+  writable: false,
+  enumerable: false,
+  configurable: false,
+});
+Object.defineProperty(__Stream__, "constructor", {
+  value: __Sink__,
+  writable: false,
+  enumerable: false,
+  configurable: false,
+});
 
 // enqueue is initiated by the input
 // input must be async iterable
