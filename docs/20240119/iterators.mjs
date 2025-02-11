@@ -79,13 +79,24 @@ export class Source {
     // Client code may stop consuming (calling next()) at any time, so values are not stored up after the last promise returned from next() is settled.
     // Client code that is still consuming is responsible for calling next() as soon as possible after the last return value has settled.
     // Calling next() multiple times between values creates multiple promises that all settle simultaneously.
-    SourceView.prototype = this.viewPrototype;
-    return new SourceView(this.#info);
+    const ret = new SourceView(this.#info);
+    Object.setPrototypeOf(ret, this.viewPrototype);
+    return ret;
   }
 }
 export const __Source__ = Source.prototype;
-__Source__.prototype = __SourceView__;
-__SourceView__.constructor = __Source__;
+Object.defineProperty(__Source__, "prototype", {
+  value: __SourceView__,
+  writable: false,
+  enumerable: false,
+  configurable: false,
+});
+Object.defineProperty(__SourceView__, "constructor", {
+  value: __Source__,
+  writable: false,
+  enumerable: false,
+  configurable: false,
+});
 
 // input must be async iterator
 // settles when the input ends
