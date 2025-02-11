@@ -28,6 +28,7 @@ export const AsyncIterator = __AsyncIterator__.constructor;  // Not guarenteed b
 class SourceView extends AsyncIterator {
   #info;
   constructor(info) {
+    super();
     this.#info = info;
   }
   next() {
