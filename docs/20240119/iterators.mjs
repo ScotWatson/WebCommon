@@ -23,32 +23,22 @@ export const __AsyncGenerator__ = __AsyncGeneratorFunction__.prototype;
 export const __AsyncIterator__ = Object.getPrototypeOf(__AsyncGenerator__);
 export const AsyncIterator = __AsyncIterator__.constructor;  // Not guarenteed by ECMAScript 2024, but supported by major browsers
 
-// Add AsyncIterator Constructor
-export function AsyncIterator() {
-}
-AsyncIterator.prototype = __AsyncIterator__;
-
-
-const __SourceView__ = Object.create(__AsyncIterator__);
 // Implements the async iterable interface
 // Produces data independent of consumption, therefore a push source
+class SourceView extends __AsyncIterator__ {
+  #info;
+  constructor(info) {
+    this.#info = info;
+  }
+  next() {
+    return new Promise((resolve, reject) => {
+      this.#info.waiting.then(resolve, reject);
+    });
+  }
+}
+export const __SourceView__ = SourceView.prototype;
 export class Source {
   #info;
-  static #SourceView = class {
-    #info;
-    constructor(info) {
-      this.#info = info;
-    }
-    next() {
-      return new Promise((resolve, reject) => {
-        this.#info.waiting.then(resolve, reject);
-      });
-    }
-  }
-  static {
-    __SourceView__.next = Source.#SourceView.prototype.next;
-    delete Source.#SourceView.prototype;
-  }
   constructor(init) {
     let _resolve = null;
     let _reject = null;
@@ -89,11 +79,11 @@ export class Source {
     // Client code may stop consuming (calling next()) at any time, so values are not stored up after the last promise returned from next() is settled.
     // Client code that is still consuming is responsible for calling next() as soon as possible after the last return value has settled.
     // Calling next() multiple times between values creates multiple promises that all settle simultaneously.
-    Source.#SourceView.prototype = this.viewPrototype;
-    const ret = new Source.#SourceView(this.#info);
+    SourceView.prototype = this.viewPrototype;
+    return new SourceView(this.#info);
   }
 }
-const __Source__ = Source.prototype;
+export const __Source__ = Source.prototype;
 __Source__.prototype = __SourceView__;
 __SourceView__.constructor = __Source__;
 
