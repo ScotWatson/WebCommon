@@ -14,5 +14,5 @@ class Window {
   constructor() {
     this.message = new Iterators.Source();
   }
-}
+};
 export window = new Window();
