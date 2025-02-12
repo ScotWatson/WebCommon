@@ -6,6 +6,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 // This creates a single "global" object for the main window realm.
 
 export * from "ES2024";
+export * from "WHATWG";
 export * from "iterators";
 
 export function hello() {
