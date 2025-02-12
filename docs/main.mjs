@@ -5,7 +5,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 // This creates a single "global" object for the main window realm.
 
-export * from "https://scotwatson.github.io/WebCommon/20250212/basic.mjs";
+//export * from "https://scotwatson.github.io/WebCommon/20250212/basic.mjs";
 export * from "https://scotwatson.github.io/WebCommon/20250212/iterators.mjs";
 
 export function hello() {
