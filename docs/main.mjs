@@ -7,7 +7,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 export * from "ES2024";
 export * from "WHATWG";
-export * from "iterators";
+export * from "streams";
 
 export function hello() {
   console.log("Hello World!");
