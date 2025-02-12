@@ -17,3 +17,4 @@ const thisSource = new Main.Source(({ next, complete, error }) => {
 const thisSourceView = thisSource[Symbol.asyncIterator]();
 const thisSink = new Main.Sink(console.log);
 const thisStream = thisSink.stream(thisSource);
+const worker = new Worker("./worker.js");
