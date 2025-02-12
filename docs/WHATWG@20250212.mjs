@@ -15,4 +15,4 @@ class Window {
     this.message = new Iterators.Source();
   }
 };
-export window = new Window();
+export const window = new Window();
