@@ -11,59 +11,60 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 // To fulfill its purpose, it must be loaded synchronously, therefore it is only provided as a classical script, to be included via importScript.
 
 class MessageQueue extends EventTarget {
-    #enabled;
-    #messageEvts;
-    #messagePort;
-    constructor(messagePort) {
-      super();
-      this.#enabled = false;
-      this.#messageEvts = [];
-      this.#messagePort = messagePort;
-      const routeMessageEvent = (evt) => {
-        const thisEvt = new evt.constructor("message", {
-          data: evt.data,
-          origin: evt.origin,
-          lastEventId: evt.lastEventId,
-          source: evt.source,
-          ports: evt.ports,
-        });
-        if (this.#enabled) {
-          this.dispatchEvent(thisEvt);
-        } else {
-          this.#messageEvts.push(thisEvt);
-        }
-      };
-      const routeMessageErrorEvent = (evt) => {
-        const thisEvt = new evt.constructor('messageerror', {
-          error: evt.error,
-          message: evt.message,
-          lineno: evt.lineno,
-          filename: evt.filename,
-        });
-        if (this.#enabled) {
-          this.dispatchEvent(thisEvt);
-        } else {
-          this.#messageEvts.push(thisEvt);
-        }
-      };
-      this.#messagePort.addEventListener("message", routeMessageEvent);
-      this.#messagePort.addEventListener("messageerror", routeMessageErrorEvent);
-    }
-    postMessage(...args) {
-      this.#messagePort.postMessage.call(this.#messagePort, ...args);
-    }
-    start() {
-      this.#enabled = true;
-      for (const messageEvt of this.#messageEvts) {
-        // Using setTimeout to place each event on its own task in the event loop to prevent blocking
-        setTimeout(() => this.dispatchEvent(messageEvt), 0);
+  #enabled;
+  #messageEvts;
+  #messagePort;
+  constructor(messagePort) {
+    super();
+    this.#enabled = false;
+    this.#messageEvts = [];
+    this.#messagePort = messagePort;
+    const routeMessageEvent = (evt) => {
+      const thisEvt = new evt.constructor("message", {
+        data: evt.data,
+        origin: evt.origin,
+        lastEventId: evt.lastEventId,
+        source: evt.source,
+        ports: evt.ports,
+      });
+      if (this.#enabled) {
+        this.dispatchEvent(thisEvt);
+      } else {
+        this.#messageEvts.push(thisEvt);
       }
-      this.#messageEvts = [];
-    }
-    stop() {
-      this.#enabled = false;
-    }
-    get isEnabled() {
-      return this.#enabled;
-    }
+    };
+    const routeMessageErrorEvent = (evt) => {
+      const thisEvt = new evt.constructor('messageerror', {
+        error: evt.error,
+        message: evt.message,
+        lineno: evt.lineno,
+        filename: evt.filename,
+      });
+      if (this.#enabled) {
+        this.dispatchEvent(thisEvt);
+      } else {
+        this.#messageEvts.push(thisEvt);
+      }
+    };
+    this.#messagePort.addEventListener("message", routeMessageEvent);
+    this.#messagePort.addEventListener("messageerror", routeMessageErrorEvent);
   }
+  postMessage(...args) {
+    this.#messagePort.postMessage.call(this.#messagePort, ...args);
+  }
+  start() {
+    this.#enabled = true;
+    for (const messageEvt of this.#messageEvts) {
+      // Using setTimeout to place each event on its own task in the event loop to prevent blocking
+      setTimeout(() => this.dispatchEvent(messageEvt), 0);
+    }
+    this.#messageEvts = [];
+  }
+  stop() {
+    this.#enabled = false;
+  }
+  get isEnabled() {
+    return this.#enabled;
+  }
+};
+window.document.currentScript.default = MessageQueue;
