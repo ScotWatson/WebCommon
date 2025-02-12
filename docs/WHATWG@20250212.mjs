@@ -12,7 +12,12 @@ export const __SharedArrayBuffer__ = self.window.crossOriginIsolated ? globalThi
 
 class Window {
   constructor() {
-    this.message = new Iterators.Source();
+  }
+  initializeMessages(queue) {
+    this.message = new Iterators.Source(({ next, complete, error }) => {
+      queue.addEventListener("message", next);
+      queue.start();
+    });
   }
 };
 export const window = new Window();
