@@ -67,4 +67,5 @@ class MessageQueue extends EventTarget {
     return this.#enabled;
   }
 };
+window.document.currentScript.exports = {};
 window.document.currentScript.exports.default = MessageQueue;
