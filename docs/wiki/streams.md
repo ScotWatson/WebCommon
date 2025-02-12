@@ -31,7 +31,7 @@ Properties:
 ## `__Source__`
 `typeof === "object"`
 
-Conforms to the iterable iterator protocol.
+Conforms to the async iterable iterator protocol.
 
 Properties:
  - `next`: async function
