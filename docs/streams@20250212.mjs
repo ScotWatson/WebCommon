@@ -7,7 +7,7 @@ import * as ES2024 from "ES2024";
 
 // Implements the async iterable interface
 // Produces data independent of consumption, therefore a push source
-class SourceIterator extends AsyncIterator {
+class SourceIterator extends ES2024.AsyncIterator {
   #info;
   constructor(info) {
     super();
@@ -33,7 +33,7 @@ export class Source {
     let _reject = null;
     this.#info = {};
     const waitForInput = () => {
-      this.#info.waiting = new Promise((resolve, reject) => {
+      this.#info.waiting = new ES2024.Promise((resolve, reject) => {
         _resolve = resolve;
         _reject = reject;
       });
@@ -67,7 +67,7 @@ export class Source {
     });
     init(capabilities);
   }
-  [Symbol.asyncIterator]() {
+  [ES2024.Symbol.asyncIterator]() {
     // This function returns a SourceIterator
     // This function may be called more than once, allowing for multiple consumers
     // Client code may stop consuming (calling next()) at any time, so values are not stored up after the last promise returned from next() is settled.
@@ -79,13 +79,13 @@ export class Source {
   }
 }
 export const __Source__ = Source.prototype;
-Object.defineProperty(__Source__, Symbol.toStringTag, {
+Object.defineProperty(__Source__, ES2024.Symbol.toStringTag, {
   value: "Source",
   writable: false,
   enumerable: false,
   configurable: false,
 });
-Object.defineProperty(__SourceIterator__, Symbol.toStringTag, {
+Object.defineProperty(__SourceIterator__, ES2024.Symbol.toStringTag, {
   value: "SourceIterator",
   writable: false,
   enumerable: false,
@@ -115,12 +115,12 @@ function createSourceFromEvent(target, eventName) {
 
 // input must be async iterator
 // settles when the input ends
-class Stream extends Promise {
+class Stream extends ES2024.Promise {
   #canceled;
   constructor(input, handler) {
     super((resolve, reject) => {
       (async () => {
-        const iterator = input[Symbol.asyncIterator]();
+        const iterator = input[ES2024.Symbol.asyncIterator]();
         let { value, done } = await iterator.next();
         while (!done && !this.#canceled) {
           handler(value);
@@ -171,13 +171,13 @@ export class Sink {
   }
 }
 export const __Sink__ = Sink.prototype;
-Object.defineProperty(__Sink__, Symbol.toStringTag, {
+Object.defineProperty(__Sink__, ES2024.Symbol.toStringTag, {
   value: "Sink",
   writable: false,
   enumerable: false,
   configurable: false,
 });
-Object.defineProperty(__Stream__, Symbol.toStringTag, {
+Object.defineProperty(__Stream__, ES2024.Symbol.toStringTag, {
   value: "Stream",
   writable: false,
   enumerable: false,
@@ -218,15 +218,15 @@ export class Queue {
   #dequeue() {
     
   }
-  *[Symbol.iterator]() {
+  *[ES2024.Symbol.iterator]() {
     while (!done) {
       yield contents.shift();
     }
   }
-  async *[Symbol.asyncIterator]() {
+  async *[ES2024.Symbol.asyncIterator]() {
     while (!done) {
       if (contents.length === 0) {
-        await new Promise((resolve) => { newInput = resolve });
+        await new ES2024.Promise((resolve) => { newInput = resolve });
       }
       yield contents.shift();
     }
