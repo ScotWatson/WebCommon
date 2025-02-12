@@ -1,11 +1,11 @@
 Last updated: 2025-02-12
 
-#Introduction
+# Introduction
 
 This streams library builds upon the existing ES2024 control abstraction object. 
 A transform function is an async generator function that takes an async iterator as an argument. A transform constructor takes a transform function as an argument.
 
-#Content
+# Content
 
 Dependencies:
  - ES2024
