@@ -14,5 +14,5 @@ function insertScript(id, url) {
 const MessageQueueScript = insertScript("MessageQueue", "https://scotwatson.github.io/WebCommon/MessageQueue@20250212.js");
 MessageQueueScript.addEventListener("load", () => {
   const MessageQueue = MessageQueueScript.exports.default;
-  window.document.currentScript.messageQueue = new MessageQueue();
+  window.document.currentScript.messageQueue = new MessageQueue(window);
 });
