@@ -1,3 +1,5 @@
+Last updated: 2025-02-12
+
 ## `GeneratorFunction`
 << constructor >>, << callable >>
 
