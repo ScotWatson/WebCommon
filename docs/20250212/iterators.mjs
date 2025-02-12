@@ -217,7 +217,7 @@ Object.defineProperty(__Stream__, Symbol.toStringTag, {
 async function * transform(getter) {
   yield await getter.next();
 }
-transform(getter);
+//transform(getter);
 
 // enqueue is initiated by the input
 // input must be async iterable
