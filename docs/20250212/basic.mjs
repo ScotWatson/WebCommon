@@ -54,7 +54,10 @@ WeakMap // ECMAScript 2024 24.3.1
 WeakSet // ECMAScript 2024 24.4
 // Structured Data
 ArrayBuffer // ECMAScript 2024 25.1.4
+if (window.crossOriginIsolated) {
+// If not cross-origin-isolated, the browser does not provide concurrent access to SharedArrayBuffers.
 SharedArrayBuffer // ECMAScript 2024 25.2.3
+}
 DataView // ECMAScript 2024 25.3.2
 // Managing Memory
 WeakRef // ECMAScript 2024 26.1.1
