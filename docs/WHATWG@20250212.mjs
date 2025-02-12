@@ -11,6 +11,8 @@ export const SharedArrayBuffer = window.crossOriginIsolated ? globalThis.SharedA
 export const __SharedArrayBuffer__ = window.crossOriginIsolated ? globalThis.SharedArrayBuffer.prototype : null;
 
 class Window {
-  message: new Iterators.Source();
+  constructor() {
+    this.message = new Iterators.Source();
+  }
 }
-export window = new Window(self.window);
+export window = new Window();
