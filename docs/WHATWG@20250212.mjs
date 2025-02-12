@@ -7,8 +7,8 @@ import * as Iterators from "iterators";
 
 // If not cross-origin-isolated, the browser does not provide concurrent access to SharedArrayBuffers.
 // ECMAScript 2024 25.2.3
-export const SharedArrayBuffer = window.crossOriginIsolated ? globalThis.SharedArrayBuffer : () => { throw new Error("Only available in cross origin isolation."); };
-export const __SharedArrayBuffer__ = window.crossOriginIsolated ? globalThis.SharedArrayBuffer.prototype : null;
+export const SharedArrayBuffer = self.window.crossOriginIsolated ? globalThis.SharedArrayBuffer : () => { throw new Error("Only available in cross origin isolation."); };
+export const __SharedArrayBuffer__ = self.window.crossOriginIsolated ? globalThis.SharedArrayBuffer.prototype : null;
 
 class Window {
   constructor() {
