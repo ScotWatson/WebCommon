@@ -115,12 +115,6 @@ export const __WeakSet__ = globalThis.WeakSet.prototype;
 // ECMAScript 2024 25.1.4
 export const ArrayBuffer = globalThis.ArrayBuffer;
 export const __ArrayBuffer__ = globalThis.ArrayBuffer.prototype;
-if (window.crossOriginIsolated) {
-// If not cross-origin-isolated, the browser does not provide concurrent access to SharedArrayBuffers.
-// ECMAScript 2024 25.2.3
-  export const SharedArrayBuffer = globalThis.SharedArrayBuffer;
-  export const __SharedArrayBuffer__ = globalThis.SharedArrayBuffer.prototype;
-}
 // ECMAScript 2024 25.3.2
 export const DataView = globalThis.DataView;
 export const __DataView__ = globalThis.DataView.prototype;
