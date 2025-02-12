@@ -11,7 +11,7 @@ me.insertScript = function insertScript(id, url) {
   script.src = url;
   window.document.write(script.outerHTML);
   return document.getElementById(id);
-}
+};
 
 const MessageQueueScript = insertScript("MessageQueue", "https://scotwatson.github.io/WebCommon/MessageQueue@20250212.js");
 
