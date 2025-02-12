@@ -3,12 +3,7 @@
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-export const __Object__ = Object.prototype;
-export const __Function__ = Function.prototype;
-export const __AsyncFunction__ = Object.getPrototypeOf(async () => {});
-export const __Array__ = Array.prototype;
-export const __Number__ = Number.prototype;
-export const __Promise__ = Promise.prototype;
+import * from "basic";
 
 export const GeneratorFunction = (function* () {}).constructor;
 export const __GeneratorFunction__ = GeneratorFunction.prototype;
