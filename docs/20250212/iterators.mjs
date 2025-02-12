@@ -318,8 +318,3 @@ function transformNode(transform, triggerSource) {
     });
   });
 }
-
-function transform(inputCapabilities, outputCapabilities) {
-//  const in = await inputCapabilities.get();
-//  outputCapabilities.put(in);
-}
