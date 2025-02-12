@@ -3,6 +3,16 @@
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-importScript("https://scotwatson.github.io/WebCommon/MessageQueue@20250212.js");
+function insertScript(id, url) {
+  const script = window.document.createElement("script");
+  script.id = id;
+  script.src = url;
+  window.document.write(script.outerHTML);
+  return document.getElementById(id);
+}
 
-window.document.currentScript.messageQueue = new MessageQueue();
+const MessageQueueScript = insertScript("MessageQueue", "https://scotwatson.github.io/WebCommon/MessageQueue@20250212.js");
+MessageQueueScript.addEventListener("load", () => {
+  const MessageQueue = MessageQueueScript.exports.default;
+  window.document.currentScript.messageQueue = new MessageQueue();
+});
