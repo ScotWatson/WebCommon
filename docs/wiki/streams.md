@@ -11,7 +11,7 @@ Dependencies:
  - ES2024
 
 ## `Sink`
-<< constructor >>, not << callable >>
+<< class constructor >>
 
 Creates a Sink instance
 
@@ -22,7 +22,7 @@ Properties:
  - `length`: `1`
  - `name`: `"Sink"`
  - `prototype`: `__Sink__`
- - [[Prototype]]: `Function.prototype`
+ - [[Prototype]]: `__Function__`
 
 ## `__Sink__`
 
@@ -43,7 +43,7 @@ Properties:
 
 
 ## `Source'
-<<constructor>>, not <<callable>>
+<< class constructor >>
 
 Creates a new Source instance
 
@@ -55,6 +55,7 @@ Parameters:
 
 Properties:
  - `prototype`: `__Source__`
+ - [[Prototype]]: `__Function__`
 
 ## `__Source__`
 
