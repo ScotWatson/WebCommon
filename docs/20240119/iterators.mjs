@@ -87,7 +87,7 @@ export class Source {
         waitForInput();
       },
     };
-    Object.defineProperty(this, "prototype", {
+    Object.defineProperty(this, "iteratorPrototype", {
       value: Object.create(__SourceIterator__),
       writable: true,
       enumerable: false,
@@ -102,23 +102,11 @@ export class Source {
     // Client code that is still consuming is responsible for calling next() as soon as possible after the last return value has settled.
     // Calling next() multiple times between values creates multiple promises that all settle simultaneously.
     const ret = new SourceIterator(this.#info);
-    Object.setPrototypeOf(ret, this.prototype);
+    Object.setPrototypeOf(ret, this.iteratorPrototype);
     return ret;
   }
 }
 export const __Source__ = Source.prototype;
-Object.defineProperty(__Source__, "prototype", {
-  value: __SourceIterator__,
-  writable: false,
-  enumerable: false,
-  configurable: false,
-});
-Object.defineProperty(__SourceIterator__, "constructor", {
-  value: __Source__,
-  writable: false,
-  enumerable: false,
-  configurable: false,
-});
 Object.defineProperty(__Source__, Symbol.toStringTag, {
   value: "Source",
   writable: false,
@@ -183,7 +171,7 @@ class Stream extends Promise {
   cancel() {
     canceled = true;
   }
-}
+};
 export const __Stream__ = Stream.prototype;
 Object.defineProperty(__Stream__, "constructor", {
   value: __Stream__.constructor,
@@ -196,7 +184,7 @@ export class Sink {
   // handler may be either sync or async function, but return value is ignored and not awaited.
   constructor(handler) {
     this.#handler = handler;
-    Object.defineProperty(this, "prototype", {
+    Object.defineProperty(this, "streamPrototype", {
       value: Object.create(__Stream__),
       writable: true,
       enumerable: false,
@@ -206,23 +194,11 @@ export class Sink {
   // The return value inherits from Promise, therefore it can be treated like a promise.
   stream(input) {
     const ret = new Stream(input, this.#handler);
-    Object.setPrototypeOf(ret, this.prototype);
+    Object.setPrototypeOf(ret, this.streamPrototype);
     return ret;
   }
 }
 export const __Sink__ = Sink.prototype;
-Object.defineProperty(__Sink__, "prototype", {
-  value: __Stream__,
-  writable: false,
-  enumerable: false,
-  configurable: false,
-});
-Object.defineProperty(__Stream__, "constructor", {
-  value: __Sink__,
-  writable: false,
-  enumerable: false,
-  configurable: false,
-});
 Object.defineProperty(__Sink__, Symbol.toStringTag, {
   value: "Sink",
   writable: false,
@@ -236,14 +212,23 @@ Object.defineProperty(__Stream__, Symbol.toStringTag, {
   configurable: false,
 });
 
+// getter is an async iterator that provides input objects
+// It takes 0 arguments and returns the next input object
+async function * transform(getter) {
+  yield await getter.next();
+}
+transform(getter);
+
 // enqueue is initiated by the input
 // input must be async iterable
 export class Queue {
   constructor(input) {
     const contents = [];
+    let newInput = () => {};
     const reader = new Sink((value) => {
       if (value !== undefined) {
         contents.push(value);
+        newInput();
       }
     });
     const reading = reader.stream(input);
@@ -257,6 +242,22 @@ export class Queue {
       },
       cancel: reading.cancel,
     };
+  }
+  #dequeue() {
+    
+  }
+  *[Symbol.iterator]() {
+    while (!done) {
+      yield contents.shift();
+    }
+  }
+  async *[Symbol.asyncIterator]() {
+    while (!done) {
+      if (contents.length === 0) {
+        await new Promise((resolve) => { newInput = resolve });
+      }
+      yield contents.shift();
+    }
   }
 }
 
