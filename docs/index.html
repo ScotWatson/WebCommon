@@ -8,6 +8,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     -->
   </head>
   <body>
+    <script type="importmap">
+      "imports": {
+        "basic": "https://scotwatson.github.io/WebCommon/basic@20250212.mjs",
+      }
+    </script>
     <!-- This is the main application code. It will be loaded in parallel with HTML parsing. It is guarenteed to start executing after HTML parsing is complete. -->
     <script type="module" src="./app.mjs"></script>
     <!-- This performs code that can only be performed safely before HTML parsing is complete. -->
