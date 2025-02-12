@@ -8,7 +8,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 // The global scope of Windows and Workers follows the MessagePort structure, therefore they can be passed as the messagePort argument to the constructor. By using the non-module version at the beginning of Window and worker scripts, messages can be queued until the script is ready.
 // This script acts as an intermediate message queue.
 
-// To fulfill its purpose, it must be loaded synchronously, therefore it is only provided as a classical script, to be included via importScript.
+// To fulfill its purpose, it must be loaded synchronously, therefore it is only provided as a classical script. To allow use in both window and worker realms, the class is added to the "self" object.
 
 class MessageQueue extends EventTarget {
   #enabled;
@@ -67,5 +67,4 @@ class MessageQueue extends EventTarget {
     return this.#enabled;
   }
 };
-window.document.currentScript.exports = {};
-window.document.currentScript.exports.default = MessageQueue;
+self.MessageQueue = MessageQueue;
