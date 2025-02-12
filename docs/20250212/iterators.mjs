@@ -150,7 +150,7 @@ class Stream extends Promise {
       (async () => {
         const iterator = input[Symbol.asyncIterator]();
         const { value, done } = await iterator.next();
-        while (!done && !canceled) {
+        while (!done && !this.#canceled) {
           handler(value);
           ({ value, done } = await iterator.next());
         }
