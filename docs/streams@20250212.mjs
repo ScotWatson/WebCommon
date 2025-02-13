@@ -10,6 +10,7 @@ import * as ES2024 from "./ES2024@20250212.mjs";
 export class Source extends ES2024.AsyncIterator {
   #info;
   constructor(init) {
+    super();
     let _resolve = null;
     let _reject = null;
     this.#info = {};
