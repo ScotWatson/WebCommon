@@ -74,14 +74,14 @@ function createSourceFromEvent(target, eventName) {
     target.removeEventListener(eventName, _next);
     _complete(value);
   };
-  const throw = (reason) => {
+  const error = (reason) => {
     target.removeEventListener(eventName, _next);
     _error(reason);
   };
   return {
     ret,
     stop,
-    throw,
+    error,
   };
 }
 
