@@ -161,6 +161,57 @@ async function * transform(getter) {
 }
 //transform(getter);
 
+export class Transform extends Source {
+  #contents;
+  #reading;
+  constructor(input, transformFunction) {
+    const output = transformFunction(dequeuer);
+    super(( next, complete, error ) => {
+      this.trigger = listener( output, next, complete, error );
+    });
+    this.#contents = [];
+    let newInput = () => {};
+    const enqueue = (value) => {
+      if (value !== undefined) {
+        contents.push(value);
+        newInput();
+      }
+    };
+    const reader = new Sink(enqueue);
+    this.#reading = reader.stream(input);
+    const dequeuer = (async function * () {
+      while (!done) {
+        if (contents.length === 0) {
+          await new ES2024.Promise((resolve) => { newInput = resolve });
+        }
+        yield contents.shift();
+      }
+    })();
+    this.output = new Source();
+  }
+  backlog() {
+    return this.#contents.length;
+  },
+  cancel() {
+    this.#reading.cancel();
+  };
+}
+
+function listener( asyncIterator, next, complete, error ) {
+  return async () => {
+    try {
+      const { value, done } = await asyncIterator.next();
+      if (done) {
+        complete(value);
+      } else {
+        next(value);
+      }
+    } catch (reason) {
+      error(reason);
+    }
+  }
+}
+
 // enqueue is initiated by the input
 // input must be async iterable
 export class Queue {
