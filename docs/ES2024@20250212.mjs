@@ -10,7 +10,7 @@ export const GeneratorFunction = (function* () {}).constructor;
 export const __GeneratorFunction__ = GeneratorFunction.prototype;
 export const __Generator__ = __GeneratorFunction__.prototype;
 // Per ECMAScript 2024, __Generator__.constuctor === __GeneratorFunction__, but typeof __GeneratorFunction__ !== "function".
-export const __Iterator__ = Object.getPrototypeOf(__Generator__);
+export const __Iterator__ = globalThis.Object.getPrototypeOf(__Generator__);
 // Dummy constructor to allow use in "extends"
 export const Iterator = (() => {
   const constructor = function () { };
@@ -21,7 +21,7 @@ export const AsyncGeneratorFunction = (async function* () {}).constructor;
 export const __AsyncGeneratorFunction__ = AsyncGeneratorFunction.prototype;
 export const __AsyncGenerator__ = __AsyncGeneratorFunction__.prototype;
 // Per ECMAScript 2024, __AsyncGenerator__.constuctor === __AsyncGeneratorFunction__, but typeof __AsyncGeneratorFunction__ !== "function".
-export const __AsyncIterator__ = Object.getPrototypeOf(__AsyncGenerator__);
+export const __AsyncIterator__ = globalThis.Object.getPrototypeOf(__AsyncGenerator__);
 // Dummy constructor to allow use in "extends"
 export const AsyncIterator = (() => {
   const constructor = function () { };
