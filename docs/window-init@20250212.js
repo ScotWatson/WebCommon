@@ -13,7 +13,7 @@ me.insertScript = function insertScript(id, url) {
   return document.getElementById(id);
 };
 
-const MessageQueueScript = insertScript("MessageQueue", "https://scotwatson.github.io/WebCommon/MessageQueue@20250212.js");
+const MessageQueueScript = me.insertScript("MessageQueue", "https://scotwatson.github.io/WebCommon/MessageQueue@20250212.js");
 
 MessageQueueScript.addEventListener("load", () => {
 //  const MessageQueue = MessageQueueScript.exports.default;
