@@ -1,3 +1,5 @@
+Last Updated: 2025-02-12
+
 # Introduction
 
 This script adds the class MessageQueue to the global object.
