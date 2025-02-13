@@ -7,7 +7,7 @@ import * as ES2024 from "./ES2024@20250212.mjs";
 
 // Implements the async iterable interface
 // Produces data independent of consumption, therefore a push source
-export class Source {
+export class Source extends ES2024.AsyncIterator {
   #info;
   constructor(init) {
     let _resolve = null;
