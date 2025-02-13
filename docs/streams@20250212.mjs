@@ -21,27 +21,25 @@ export class Source extends ES2024.AsyncIterator {
       });
     }
     waitForInput();
-    const capabilities = {
-      next(value) {
-        _resolve({
-          value,
-          done: false,
-        });
-        waitForInput();
-      },
-      complete(value) {
-        _resolve({
-          value,
-          done: false,
-        });
-        waitForInput();
-      },
-      error(reason) {
-        _reject(reason);
-        waitForInput();
-      },
+    const next = (value) => {
+      _resolve({
+        value,
+        done: false,
+      });
+      waitForInput();
     };
-    init(capabilities);
+    const complete = (value) => {
+      _resolve({
+        value,
+        done: true,
+      });
+      waitForInput();
+    };
+    const error = (reason) => {
+      _reject(reason);
+      waitForInput();
+    };
+    init(next, complete, error);
   }
   // This function may be called more than once, allowing for multiple consumers
   // Client code may stop consuming (calling next()) at any time, so values are not stored up after the last promise returned from next() is settled.
@@ -65,13 +63,13 @@ function createSourceFromEvent(target, eventName) {
   let _next;
   let _complete;
   let _error;
-  const ret = new Source(({ next, complete, error }) => {
+  const source = new Source(( next, complete, error ) => {
     target.addEventListener(eventName, next);
     _next = next;
     _complete = complete;
     _error = error;
   });
-  const stop = (value) => {
+  const complete = (value) => {
     target.removeEventListener(eventName, _next);
     _complete(value);
   };
@@ -80,8 +78,8 @@ function createSourceFromEvent(target, eventName) {
     _error(reason);
   };
   return {
-    ret,
-    stop,
+    source,
+    complete,
     error,
   };
 }
