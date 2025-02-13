@@ -76,3 +76,19 @@ Properties:
  - `throw`: function
  - `[Symbol.toStringTag]`: `"Stream"`
  - [[Prototype]]: `__Promise__`
+
+## `createSourceFromEvent`
+`typeof === "function"`
+not << constructable >>
+
+Parameters:
+ - target
+ - eventName
+
+Return Value:
+`typeof === "object"`
+
+Properties:
+ - source: `typeof === "object"`; a new Source instance
+ - complete: `typeof === "function"`; accepts one optional argument, closes the source with the specified value
+ - error: `typeof === "function"`; accepts a reason argument, closes the source with the specified reason
