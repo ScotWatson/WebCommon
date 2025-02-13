@@ -7,25 +7,6 @@ import * as ES2024 from "ES2024";
 
 // Implements the async iterable interface
 // Produces data independent of consumption, therefore a push source
-class SourceIterator extends ES2024.AsyncIterator {
-  #info;
-  constructor(info) {
-    super();
-    this.#info = info;
-  }
-  next() {
-    return new Promise((resolve, reject) => {
-      this.#info.waiting.then(resolve, reject);
-    });
-  }
-}
-export const __SourceIterator__ = SourceIterator.prototype;
-Object.defineProperty(__SourceIterator__, "constructor", {
-  value: __SourceIterator__.constructor,
-  writable: false,
-  enumerable: false,
-  configurable: false,
-});
 export class Source {
   #info;
   constructor(init) {
@@ -59,34 +40,21 @@ export class Source {
         waitForInput();
       },
     };
-    Object.defineProperty(this, "iteratorPrototype", {
-      value: Object.create(__SourceIterator__),
-      writable: true,
-      enumerable: false,
-      configurable: false,
-    });
     init(capabilities);
   }
-  [ES2024.Symbol.asyncIterator]() {
-    // This function returns a SourceIterator
-    // This function may be called more than once, allowing for multiple consumers
-    // Client code may stop consuming (calling next()) at any time, so values are not stored up after the last promise returned from next() is settled.
-    // Client code that is still consuming is responsible for calling next() as soon as possible after the last return value has settled.
-    // Calling next() multiple times between values creates multiple promises that all settle simultaneously.
-    const ret = new SourceIterator(this.#info);
-    Object.setPrototypeOf(ret, this.iteratorPrototype);
-    return ret;
+  // This function may be called more than once, allowing for multiple consumers
+  // Client code may stop consuming (calling next()) at any time, so values are not stored up after the last promise returned from next() is settled.
+  // Client code that is still consuming is responsible for calling next() as soon as possible after the last return value has settled.
+  // Calling next() multiple times between values creates multiple promises that all settle simultaneously.
+  next() {
+    return new Promise((resolve, reject) => {
+      this.#info.waiting.then(resolve, reject);
+    });
   }
 }
 export const __Source__ = Source.prototype;
 Object.defineProperty(__Source__, ES2024.Symbol.toStringTag, {
   value: "Source",
-  writable: false,
-  enumerable: false,
-  configurable: false,
-});
-Object.defineProperty(__SourceIterator__, ES2024.Symbol.toStringTag, {
-  value: "SourceIterator",
   writable: false,
   enumerable: false,
   configurable: false,
@@ -102,25 +70,28 @@ function createSourceFromEvent(target, eventName) {
     _complete = complete;
     _error = error;
   });
-  ret.stop = (value) => {
+  const stop = (value) => {
     target.removeEventListener(eventName, _next);
     _complete(value);
   };
-  ret.throw = (reason) => {
+  const throw = (reason) => {
     target.removeEventListener(eventName, _next);
     _error(reason);
   };
-  return ret;
+  return {
+    ret,
+    stop,
+    throw,
+  };
 }
 
 // input must be async iterator
 // settles when the input ends
 class Stream extends ES2024.Promise {
   #canceled;
-  constructor(input, handler) {
+  constructor(iterator, handler) {
     super((resolve, reject) => {
       (async () => {
-        const iterator = input[ES2024.Symbol.asyncIterator]();
         let { value, done } = await iterator.next();
         while (!done && !this.#canceled) {
           handler(value);
@@ -204,7 +175,7 @@ export class Queue {
       }
     });
     const reading = reader.stream(input);
-//    const ret = await reading;
+ //    const ret = await reading;
     return {
       dequeue() {
         return contents.shift();
