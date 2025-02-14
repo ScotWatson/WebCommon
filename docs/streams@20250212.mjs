@@ -86,7 +86,7 @@ function createSourceFromEvent(target, eventName) {
 
 // input must be async iterator
 // settles when the input ends
-class Stream extends ES2024.Promise {
+export class Stream extends ES2024.Promise {
   #canceled;
   constructor(iterator, handler) {
     super((resolve, reject) => {
@@ -117,32 +117,6 @@ class Stream extends ES2024.Promise {
 export const __Stream__ = Stream.prototype;
 Object.defineProperty(__Stream__, "constructor", {
   value: __Stream__.constructor,
-  writable: false,
-  enumerable: false,
-  configurable: false,
-});
-export class Sink {
-  #handler;
-  // handler may be either sync or async function, but return value is ignored and not awaited.
-  constructor(handler) {
-    this.#handler = handler;
-    Object.defineProperty(this, "streamPrototype", {
-      value: Object.create(__Stream__),
-      writable: true,
-      enumerable: false,
-      configurable: false,
-    });
-  }
-  // The return value inherits from Promise, therefore it can be treated like a promise.
-  stream(input) {
-    const ret = new Stream(input, this.#handler);
-    Object.setPrototypeOf(ret, this.streamPrototype);
-    return ret;
-  }
-}
-export const __Sink__ = Sink.prototype;
-Object.defineProperty(__Sink__, ES2024.Symbol.toStringTag, {
-  value: "Sink",
   writable: false,
   enumerable: false,
   configurable: false,
@@ -212,9 +186,24 @@ function listener( asyncIterator, next, complete, error ) {
   }
 }
 
+function createQueue() {
+  let contents = [];
+  return {
+    enqueue: ( value ) => {
+      if (value !== undefined) {
+        contents.push();
+      }
+    },
+    dequeue: () => {
+      return contents.shift();
+    },
+    get backlog() { return contents.length },
+  };
+}
+
 // enqueue is initiated by the input
 // input must be async iterable
-export class Queue {
+export class Outlet extends Iterator {
   constructor(input) {
     const contents = [];
     let newInput = () => {};
