@@ -5,20 +5,39 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 import * as ES2024 from "./ES2024@20250212.mjs";
 
+export function createPromiseCapability() {
+  const ret = {};
+  ret.promise = new ES2024.Promise(( resolve, reject ) => {
+    ret.resolve = resolve;
+    ret.reject = reject;
+  });
+  return ret;
+}
+
+function createQueue() {
+  let contents = [];
+  return {
+    enqueue: ( value ) => {
+      if (value !== undefined) {
+        contents.push();
+      }
+    },
+    dequeue: () => {
+      return contents.shift();
+    },
+    get backlog() { return contents.length },
+  };
+}
+
 // Implements the async iterable interface
 // Produces data independent of consumption, therefore a push source
 export class Source extends ES2024.AsyncIterator {
   #info;
   constructor(init) {
     super();
-    let _resolve = null;
-    let _reject = null;
     this.#info = {};
     const waitForInput = () => {
-      this.#info.waiting = new ES2024.Promise((resolve, reject) => {
-        _resolve = resolve;
-        _reject = reject;
-      });
+      Object.assign(this.#info, createPromiseCapability());
     }
     waitForInput();
     const next = (value) => {
@@ -47,8 +66,72 @@ export class Source extends ES2024.AsyncIterator {
   // Calling next() multiple times between values creates multiple promises that all settle simultaneously.
   next() {
     return new Promise((resolve, reject) => {
-      this.#info.waiting.then(resolve, reject);
+      this.#info.promise.then(resolve, reject);
     });
+  }
+  stream(sinkFunction) {
+    return new Stream(this, sinkFunction);
+  }
+  *pipe() {
+    let done = false;
+    let retVal;
+    let error;
+    const queue = createQueue();
+    const reader = this.stream((value) => {
+      if (value !== undefined) {
+        queue.enqueue(value);
+      }
+    });
+    reader.then((value) => {
+      done = true;
+      retVal = value;
+    }, (reason) => {
+      done = true;
+      error = reason;
+    });
+    while (!done) {
+      yield queue.dequeue();
+    }
+    if (error === undefined) {
+      return retVal;
+    } else {
+      throw error;
+    }
+  }
+  async *asyncPipe() {
+    let done = false;
+    let retVal;
+    let error;
+    let nextInput;
+    const queue = createQueue();
+    const reader = this.stream((value) => {
+      if (value !== undefined) {
+        queue.enqueue(value);
+        nextInput.resolve();
+        nextInput = createPromiseCapability();
+      }
+    });
+    reader.then((value) => {
+      done = true;
+      retVal = value;
+    }, (reason) => {
+      done = true;
+      error = reason;
+    });
+    while (!done) {
+      yield await dequeue();
+    }
+    if (error === undefined) {
+      return retVal;
+    } else {
+      throw error;
+    }
+    async function dequeue() {
+      if (queue.backlog === 0) {
+        await nextInput.promise;
+      }
+      return queue.dequeue();
+    }
   }
 }
 export const __Source__ = Source.prototype;
@@ -59,28 +142,29 @@ Object.defineProperty(__Source__, ES2024.Symbol.toStringTag, {
   configurable: false,
 });
 
-function createSourceFromEvent(target, eventName) {
-  let _next;
-  let _complete;
-  let _error;
-  const source = new Source(( next, complete, error ) => {
-    target.addEventListener(eventName, next);
-    _next = next;
-    _complete = complete;
-    _error = error;
+export function createSourceCapability() {
+  const ret = {};
+  ret.source = new Source(( next, complete, error ) => {
+    ret.next = next;
+    ret.complete = complete;
+    ret.error = error;
   });
-  const complete = (value) => {
-    target.removeEventListener(eventName, _next);
-    _complete(value);
-  };
-  const error = (reason) => {
-    target.removeEventListener(eventName, _next);
-    _error(reason);
-  };
+  return ret;
+}
+
+export function createSourceFromEvent(target, eventName) {
+  const controlledSource = createSourceCapability();
+  target.addEventListener(eventName, controlledSource.next);
   return {
-    source,
-    complete,
-    error,
+    source: controlledSource.source,
+    complete(value) => {
+      target.removeEventListener(eventName, controlledSource.next);
+      controlledSource.complete(value);
+    },
+    error(reason) => {
+      target.removeEventListener(eventName, controlledSource.next);
+      controlledSource.error(reason);
+    },
   };
 }
 
@@ -88,13 +172,13 @@ function createSourceFromEvent(target, eventName) {
 // settles when the input ends
 export class Stream extends ES2024.Promise {
   #canceled;
-  constructor(iterator, handler) {
+  constructor(source, sinkFunction) {
     super((resolve, reject) => {
       (async () => {
-        let { value, done } = await iterator.next();
+        let { value, done } = await source.next();
         while (!done && !this.#canceled) {
-          handler(value);
-          ({ value, done } = await iterator.next());
+          sinkFunction(value);
+          ({ value, done } = await source.next());
         }
         if (canceled) {
           throw new Error("Stream was canceled.");
@@ -182,63 +266,6 @@ function listener( asyncIterator, next, complete, error ) {
       }
     } catch (reason) {
       error(reason);
-    }
-  }
-}
-
-function createQueue() {
-  let contents = [];
-  return {
-    enqueue: ( value ) => {
-      if (value !== undefined) {
-        contents.push();
-      }
-    },
-    dequeue: () => {
-      return contents.shift();
-    },
-    get backlog() { return contents.length },
-  };
-}
-
-// enqueue is initiated by the input
-// input must be async iterable
-export class Outlet extends Iterator {
-  constructor(input) {
-    const contents = [];
-    let newInput = () => {};
-    const reader = new Sink((value) => {
-      if (value !== undefined) {
-        contents.push(value);
-        newInput();
-      }
-    });
-    const reading = reader.stream(input);
- //    const ret = await reading;
-    return {
-      dequeue() {
-        return contents.shift();
-      },
-      backlog() {
-        return contents.length;
-      },
-      cancel: reading.cancel,
-    };
-  }
-  #dequeue() {
-    
-  }
-  *[ES2024.Symbol.iterator]() {
-    while (!done) {
-      yield contents.shift();
-    }
-  }
-  async *[ES2024.Symbol.asyncIterator]() {
-    while (!done) {
-      if (contents.length === 0) {
-        await new ES2024.Promise((resolve) => { newInput = resolve });
-      }
-      yield contents.shift();
     }
   }
 }
