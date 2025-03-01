@@ -11,6 +11,14 @@ export function gammaEncode(v) {
   return ( v <= 0.0031308 ) ? ( 12.92 * v ) : 1.055 * Math.pow( v, 1 / 2.4) - 0.055;
 }
 
+export function createRGBBuffers(width, height) {
+  return {
+    R: new Float64Array(width * height),
+    G: new Float64Array(width * height),
+    B: new Float64Array(width * height),
+  };
+}
+
 export function createXYZBuffers(width, height) {
   return {
     X: new Float64Array(width * height),
@@ -19,19 +27,27 @@ export function createXYZBuffers(width, height) {
   };
 }
 
-export function getXYZ(imageData, result) {
+export function getRGBFromImage(imageData, result) {
   for (let j = 0; j < imageData.height; ++j) {
     for (let i = 0; i < imageData.width; ++i) {
       const baseIndex = imageData.width * j + i;
-      const r = imageData.data[4 * baseIndex] / 255;
-      const g = imageData.data[4 * baseIndex + 1] / 255;
-      const b = imageData.data[4 * baseIndex + 2] / 255;
-      const r_linear = gammaDecode(r);
-      const g_linear = gammaDecode(g);
-      const b_linear = gammaDecode(b);
-      result.X[baseIndex] = 0.4124 * r_linear + 0.3576 * g_linear + 0.1805 * b_linear;
-      result.Y[baseIndex] = 0.2126 * r_linear + 0.7152 * g_linear + 0.0722 * b_linear;
-      result.Z[baseIndex] = 0.0193 * r_linear + 0.1192 * g_linear + 0.9505 * b_linear;
+      const r_gamma = imageData.data[4 * baseIndex] / 255;
+      const g_gamma = imageData.data[4 * baseIndex + 1] / 255;
+      const b_gamma = imageData.data[4 * baseIndex + 2] / 255;
+      result.R[baseIndex] = gammaDecode(r_gamma);
+      result.G[baseIndex] = gammaDecode(g_gamma);
+      result.B[baseIndex] = gammaDecode(b_gamma);
+    }
+  }
+}
+
+export function getXYZFromRGB(rgb, result) {
+  for (let j = 0; j < imageData.height; ++j) {
+    for (let i = 0; i < imageData.width; ++i) {
+      const baseIndex = imageData.width * j + i;
+      result.X[baseIndex] = 0.4124 * rgb.R[baseIndex] + 0.3576 * rgb.G[baseIndex] + 0.1805 * rgb.B[baseIndex];
+      result.Y[baseIndex] = 0.2126 * rgb.R[baseIndex] + 0.7152 * rgb.G[baseIndex] + 0.0722 * rgb.B[baseIndex];
+      result.Z[baseIndex] = 0.0193 * rgb.R[baseIndex] + 0.1192 * rgb.G[baseIndex] + 0.9505 * rgb.B[baseIndex];
     }
   }
 }
