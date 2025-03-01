@@ -12,7 +12,7 @@ export function gammaEncode(v) {
 }
 
 export function createXYZBuffers(width, height) {
-  const ret = {
+  return {
     X: new Float64Array(width * height),
     Y: new Float64Array(width * height),
     Z: new Float64Array(width * height),
