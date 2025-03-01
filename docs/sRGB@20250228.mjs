@@ -1,0 +1,37 @@
+/*
+(c) 2025 Scot Watson  All Rights Reserved
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
+export function gammaDecode(u) {
+  return ( u <= 0.04045 ) ? ( u / 12.92 ) : Math.pow( ( ( u + 0.055 ) / 1.055 ), 2.4);
+}
+
+export function gammaEncode(v) {
+  return ( v <= 0.0031308 ) ? ( 12.92 * v ) : 1.055 * Math.pow( v, 1 / 2.4) - 0.055;
+}
+
+export function createXYZBuffers(width, height) {
+  const ret = {
+    X: new Float64Array(width * height),
+    Y: new Float64Array(width * height),
+    Z: new Float64Array(width * height),
+  };
+}
+
+export function getXYZ(imageData, result) {
+  for (let j = 0; j < imageData.height; ++j) {
+    for (let i = 0; i < imageData.width; ++i) {
+      const baseIndex = imageData.width * j + i;
+      const r = imageData.data[4 * baseIndex] / 255;
+      const g = imageData.data[4 * baseIndex + 1] / 255;
+      const b = imageData.data[4 * baseIndex + 2] / 255;
+      const r_linear = gammaDecode(r);
+      const g_linear = gammaDecode(g);
+      const b_linear = gammaDecode(b);
+      result.X[baseIndex] = 0.4124 * r_linear + 0.3576 * g_linear + 0.1805 * b_linear;
+      result.Y[baseIndex] = 0.2126 * r_linear + 0.7152 * g_linear + 0.0722 * b_linear;
+      result.Z[baseIndex] = 0.0193 * r_linear + 0.1192 * g_linear + 0.9505 * b_linear;
+    }
+  }
+}
