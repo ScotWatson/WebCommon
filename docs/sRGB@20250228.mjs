@@ -46,13 +46,10 @@ export function getRGBFromImage(imageData, result) {
 }
 
 export function getXYZFromRGB(rgb, result) {
-  for (let j = 0; j < rgb.height; ++j) {
-    for (let i = 0; i < rgb.width; ++i) {
-      const baseIndex = rgb.width * j + i;
-      result.X[baseIndex] = 0.4124 * rgb.R[baseIndex] + 0.3576 * rgb.G[baseIndex] + 0.1805 * rgb.B[baseIndex];
-      result.Y[baseIndex] = 0.2126 * rgb.R[baseIndex] + 0.7152 * rgb.G[baseIndex] + 0.0722 * rgb.B[baseIndex];
-      result.Z[baseIndex] = 0.0193 * rgb.R[baseIndex] + 0.1192 * rgb.G[baseIndex] + 0.9505 * rgb.B[baseIndex];
-    }
+  for (let i = 0; i < rgb.height * rgb.width; ++i) {
+    result.X[i] = 0.4124 * rgb.R[i] + 0.3576 * rgb.G[i] + 0.1805 * rgb.B[i];
+    result.Y[i] = 0.2126 * rgb.R[i] + 0.7152 * rgb.G[i] + 0.0722 * rgb.B[i];
+    result.Z[i] = 0.0193 * rgb.R[i] + 0.1192 * rgb.G[i] + 0.9505 * rgb.B[i];
   }
 }
 
