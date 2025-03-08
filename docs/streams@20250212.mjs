@@ -157,11 +157,11 @@ export function createSourceFromEvent(target, eventName) {
   target.addEventListener(eventName, controlledSource.next);
   return {
     source: controlledSource.source,
-    complete(value) => {
+    complete: (value) => {
       target.removeEventListener(eventName, controlledSource.next);
       controlledSource.complete(value);
     },
-    error(reason) => {
+    error: (reason) => {
       target.removeEventListener(eventName, controlledSource.next);
       controlledSource.error(reason);
     },
