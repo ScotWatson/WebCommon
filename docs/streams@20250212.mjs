@@ -249,10 +249,10 @@ export class Transform extends Source {
   }
   backlog() {
     return this.#contents.length;
-  },
+  }
   cancel() {
     this.#reading.cancel();
-  };
+  }
 }
 
 function listener( asyncIterator, next, complete, error ) {
