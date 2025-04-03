@@ -327,3 +327,160 @@ function transformNode(transform, triggerSource) {
     });
   });
 }
+
+class ChunkSource extends Source {
+  #currentBuffer;
+  #currentIndex;
+  #currentDataview;
+  constructor(chunkSize) {
+    this.#currentBuffer = new ES2024.ArrayBuffer(chunkSize);
+    this.#currentIndex = 0;
+  }
+  get setter() {
+    return {
+      writeUnsignedInt8(value) {
+        this.#currentDataView.setUint8(this.#currentIndex, value);
+        this.#currentIndex += 1;
+        if (this.#currentIndex === chunkSize) {
+          this.#currentBuffer = new ES2024.ArrayBuffer(chunkSize);
+          this.#currentIndex = 0;
+        }
+      },
+    };
+  }
+}
+
+class ChunkSink {
+  
+}
+const dataInput = {
+  readUnsignedInt8() {
+    
+  },
+  readSignedInt8() {
+    
+  },
+  readUnsignedInt16LE() {
+    
+  },
+  readUnsignedInt16BE() {
+    
+  },
+  readSignedInt16LE() {
+    
+  },
+  readSignedInt16BE() {
+    
+  },
+  readUnsignedInt32LE() {
+    
+  },
+  readUnsignedInt32BE() {
+    
+  },
+  readSignedInt32LE() {
+    
+  },
+  readSignedInt32BE() {
+    
+  },
+  readUnsignedInt64LE() {
+    
+  },
+  readUnsignedInt64BE() {
+    
+  },
+  readSignedInt64LE() {
+    
+  },
+  readSignedInt64BE() {
+    
+  },
+  readFloat16LE() {
+    
+  },
+  readFloat16BE() {
+    
+  },
+  readFloat32LE() {
+    
+  },
+  readFloat32BE() {
+    
+  },
+  readFloat64LE() {
+    
+  },
+  readFloat64BE() {
+    
+  },
+  readBytes(numBytes) {
+    return 
+  }
+};
+
+const dataOutput = {
+  setUnsignedInt8() {
+    
+  }
+  setSignedInt8() {
+    
+  }
+  setUnsignedInt16LE() {
+    
+  }
+  setUnsignedInt16BE() {
+    
+  }
+  setSignedInt16LE() {
+    
+  }
+  setSignedInt16BE() {
+    
+  }
+  setUnsignedInt32LE() {
+    
+  }
+  setUnsignedInt32BE() {
+    
+  }
+  setSignedInt32LE() {
+    
+  }
+  setSignedInt32BE() {
+    
+  }
+  setUnsignedInt64LE() {
+    
+  }
+  setUnsignedInt64BE() {
+    
+  }
+  setSignedInt64LE() {
+    
+  }
+  setSignedInt64BE() {
+    
+  }
+  setFloat16LE() {
+    
+  }
+  setFloat16BE() {
+    
+  }
+  setFloat32LE() {
+    
+  }
+  setFloat32BE() {
+    
+  }
+  setFloat64LE() {
+    
+  }
+  setFloat64BE() {
+    
+  }
+  setBytes(arrayBuffer) {
+    return 
+  }
+};
